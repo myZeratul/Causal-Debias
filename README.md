@@ -13,9 +13,7 @@ We implement Causal-Debias with following dependencies:
 * transformers
 
 ## Data
-Download the [GLUE data](https://gluebenchmark.com/tasks) 
-After Downloading
-Unpack it to some directory `$GLUE_DIR`.
+Download the [GLUE data](https://gluebenchmark.com/tasks) (SST-2, QNLI, CoLA). After downloading, unpack it to some directory.
 
 ## Usage
 
