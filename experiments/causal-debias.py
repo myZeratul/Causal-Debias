@@ -617,10 +617,8 @@ def get_top_k_features(args, feature, tokenizer, model, device, external_ids_lis
         hidden_states = output["hidden_states"]
         first = hidden_states[1].transpose(1, 2)
         last = hidden_states[-1].transpose(1, 2)
-        first_avg = torch.avg_pool1d(first, kernel_size=last.shape[-1]).squeeze(-1)  # [batch, 768]
-        last_avg = torch.avg_pool1d(last, kernel_size=last.shape[-1]).squeeze(-1)  # [batch, 768]
-        avg = torch.cat((first_avg.unsqueeze(1), last_avg.unsqueeze(1)), dim=1)
-        mean_pooled = torch.avg_pool1d(avg.transpose(1, 2), kernel_size=2).squeeze(-1)
+        first_avg = torch.avg_pool1d(first, kernel_size=last.shape[-1]).squeeze(-1)
+        mean_pooled = torch.avg_pool1d(first_avg.transpose(1, 2), kernel_size=2).squeeze(-1)
 
         result = F.cosine_similarity(mean_pooled,embedding)
         _, index = torch.sort(result, descending=True)
