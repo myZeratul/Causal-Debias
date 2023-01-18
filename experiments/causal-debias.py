@@ -166,34 +166,26 @@ parser.add_argument(
     type=str,
     help="The output directory where the model predictions and checkpoints will be written."
 )
-    
-parser.add_argument(
-    "--warmup_proportion",
-    default=0.1,
-    type=float,
-    help="Proportion of training to perform linear learning rate warmup for. "
-    "E.g., 0.1 = 10%% of training."
-)
 
 parser.add_argument(
     "--data_path",
     default="data/gender_data/",
     type=str,
-    help="data path to put the taget/attribute word list",
+    help="Data path to put the target/attribute word list",
 )
 
 parser.add_argument(
     '--external_data', 
-    default=" ",
+    default="",
     type=str,  
-    help='external data'
+    help='Dir that saved external data'
 )
 
 parser.add_argument(
     '--tau', 
     default=0.5,
     type=float,  
-    help='hyper parameters'
+    help='Hyper parameters'
 )
 
 
