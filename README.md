@@ -13,7 +13,7 @@ We implement Causal-Debias with following dependencies:
 * transformers
 
 ## Data
-Download the [GLUE data](https://gluebenchmark.com/tasks) (SST-2, QNLI, CoLA). After downloading, unpack it to some directory.
+Download the GLUE data (SST-2, QNLI, CoLA). After downloading, unpack it to some directory.
 
 ## Usage
 
@@ -45,11 +45,3 @@ python causal-debias.py
 --k  top k similar sentence to extend
 --tau  a trade-off hyperparameters
 ```
-
-## Evaluation
- ### SEAT
- We run the [SEAT](https://github.com/pliang279/sent_debias) using the code from Liang et al.
- ### CrowS-Pairs
- We run the [CrowS-Pairs](https://github.com/nyu-mll/crows-pairs) using the code from Nangia et al.
-
-
