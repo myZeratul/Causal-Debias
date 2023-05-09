@@ -15,6 +15,9 @@ We implement Causal-Debias with following dependencies:
 ## Data
 Download the GLUE data (SST-2, QNLI, CoLA). After downloading, unpack it to some directory.
 
+## External Corpora
+We use the Corpora from the paper [Towards Debiasing Sentence Representations](https://aclanthology.org/2020.acl-main.488/)
+
 ## Usage
 
 Go to directory `experiment`.
