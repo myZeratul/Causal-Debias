@@ -9,13 +9,12 @@ import time
 import numpy as np
 import torch.nn.functional as F
 
-
-from scipy.stats import wasserstein_distance
 from utils import *
 from functools import reduce
 from tqdm import tqdm, trange
-from torch.utils.data import DataLoader
 from torch.nn import CrossEntropyLoss
+from torch.utils.data import DataLoader
+from scipy.stats import wasserstein_distance
 from torch.utils.data import DataLoader, RandomSampler,TensorDataset
 
 from transformers import AdamW
@@ -447,18 +446,13 @@ def convert_examples_to_augfeatures(examples, label_list, max_seq_length, tokeni
     for tuple_example in enumerate(examples):
         example = tuple_example[1]
         tokens_a = tokenizer.tokenize(example.text_a)
-        # print(tokens_a)
         it_male = iter(male)
         it_female = iter(female)
-
         flag_a = False
-
         for count in range(len(male)):
             count += 1
-
             text_male = next(it_male)
             text_female = next(it_female)  
-            # print(text_male, text_female)
             if text_female in tokens_a:
                 tokens_a[tokens_a.index(text_female)] = text_male
                 flag_a = True
@@ -467,34 +461,22 @@ def convert_examples_to_augfeatures(examples, label_list, max_seq_length, tokeni
                 flag_a = True
             else:
                 continue
-        
         if flag_a:
             aug_sentence_a = " ".join(tokens_a).replace(" ##", "").strip()
-            # print(aug_sentence_a)
             aug_sentence_list.append(aug_sentence_a)
-            # print(tokens_a)
-            None 
         else:
             continue
 
         tokens_b = None
-
         if example.text_b:
             tokens_b = tokenizer.tokenize(example.text_b)
-
-            # print(tokens_b)
             it1_male = iter(male)
             it1_female = iter(female)
-        
             flag_b = False
-
             for count in range(len(male)):
                 count += 1
-
                 text_male = next(it1_male)
                 text_female = next(it1_female)  
-
-                # print(text_male, text_female)
                 if text_female in tokens_b:
                     tokens_b[tokens_b.index(text_female)] = text_male
                     flag_b = True
@@ -506,7 +488,6 @@ def convert_examples_to_augfeatures(examples, label_list, max_seq_length, tokeni
             
             if flag_b:
                 aug_sentence_b = " ".join(tokens_b).replace(" ##", "").strip()
-                # print(aug_sentence_b)
                 aug_sentence_list.append(aug_sentence_b)
             else:
                 continue
@@ -615,11 +596,9 @@ def get_top_k_features(args, feature, tokenizer, model, device, external_ids_lis
     with torch.no_grad():
         output = model(ori_tokens_tensor,segments_tensor)
         hidden_states = output["hidden_states"]
-        first = hidden_states[1].transpose(1, 2)
         last = hidden_states[-1].transpose(1, 2)
-        first_avg = torch.avg_pool1d(first, kernel_size=last.shape[-1]).squeeze(-1)
-        mean_pooled = torch.avg_pool1d(first_avg.transpose(1, 2), kernel_size=2).squeeze(-1)
-
+        last_avg = torch.avg_pool1d(last, kernel_size=last.shape[-1]).squeeze(-1)
+        mean_pooled = torch.avg_pool1d(last_avg.transpose(1, 2), kernel_size=2).squeeze(-1)
         result = F.cosine_similarity(mean_pooled,embedding)
         _, index = torch.sort(result, descending=True)
         top_k_index = index[:(args.k)]
@@ -719,8 +698,6 @@ if __name__ == "__main__":
     nb_tr_steps = 0    
     tr_loss = 0
 
-
-
     if args.do_train:
         logger.info("Prepare training features")
 
@@ -770,9 +747,6 @@ if __name__ == "__main__":
         train_data = TensorDataset(all_input_ids, all_input_mask, all_segment_ids, all_label_ids)
         train_sampler = RandomSampler(train_data)
         train_dataloader = DataLoader(train_data, sampler=train_sampler, batch_size=args.train_batch_size)
-
-
-        jsd_model = JSD()
 
         model.zero_grad()
         
@@ -875,7 +849,11 @@ if __name__ == "__main__":
             male_words_ = load_word_list(args.data_path+"male.txt")
             female_words_ = load_word_list(args.data_path+"female.txt")
             tar1_words, tar2_words = clean_word_list2(male_words_, female_words_,tokenizer)
-        
+        elif args.debias_type=='race':
+            race1_words_ = load_word_list(args.data_path+"race1.txt")
+            race2_words_ = load_word_list(args.data_path+"race2.txt")
+            tar1_words, tar2_words = clean_word_list2(race1_words_, race2_words_,tokenizer)
+
         eval_examples = processor.get_dev_examples(args.data_dir)
         eval_features = convert_examples_to_features(
             eval_examples, label_list, args.max_seq_length, tokenizer, output_mode)

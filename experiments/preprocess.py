@@ -108,13 +108,9 @@ if __name__ == "__main__":
         with torch.no_grad():
             output = model(input_ids, input_mask)
             hidden_states = output["hidden_states"]
-            first = hidden_states[1].transpose(1, 2)
             last = hidden_states[-1].transpose(1, 2)
-
-            first_avg = torch.avg_pool1d(first, kernel_size=last.shape[-1]).squeeze(-1)  # [batch, 768]
-            last_avg = torch.avg_pool1d(last, kernel_size=last.shape[-1]).squeeze(-1)  # [batch, 768]
-            avg = torch.cat((first_avg.unsqueeze(1), last_avg.unsqueeze(1)), dim=1)
-            mean_pooled = torch.avg_pool1d(avg.transpose(1, 2), kernel_size=2).squeeze(-1)
+            last_avg = torch.avg_pool1d(last, kernel_size=last.shape[-1]).squeeze(-1)
+            mean_pooled = torch.avg_pool1d(last_avg.transpose(1, 2), kernel_size=2).squeeze(-1)
             mean_pooled_array = mean_pooled.detach().cpu().numpy()
 
             for temp_mean in mean_pooled_array:
